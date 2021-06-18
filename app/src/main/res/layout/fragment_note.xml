@@ -3,17 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".view.fragment.HolidayFragment">
+    tools:context=".view.fragment.NoteFragment">
+
 
     <TextView
         android:id="@+id/text_view_date"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="Implementasi"
+        android:text="Important"
         android:layout_marginTop="15dp"
         android:layout_marginRight="15dp"
         android:layout_marginLeft="15dp"
-        android:textSize="22sp"
+        android:textSize="22dp"
         android:fontFamily="sans-serif-thin"
         android:textColor="#525252"
 
@@ -21,7 +22,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:text="HolidayAPI"
+        android:text="Notes"
         android:layout_marginTop="42dp"
         android:layout_marginRight="15dp"
         android:layout_marginLeft="15dp"
@@ -31,10 +32,19 @@
         />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/fragmentholiday_rv"
+        android:id="@+id/fragmentnote_rv"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/item_list"
+        tools:listitem="@layout/note_item"
         android:layout_marginTop="100dp"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/button_add_note"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="30dp"
+        />
 
 </FrameLayout>
