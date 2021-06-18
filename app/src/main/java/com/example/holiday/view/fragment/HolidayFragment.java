@@ -21,11 +21,7 @@ import com.example.holiday.view.viewmodel.HolidayViewModel;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link HolidayFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class HolidayFragment extends Fragment {
 
     private HolidayDiscoverAdapter holidayDiscoverAdapter;

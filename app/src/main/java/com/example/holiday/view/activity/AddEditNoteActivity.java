@@ -15,29 +15,37 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.holiday.R;
 
-public class AddNoteActivity extends AppCompatActivity {
+public class AddEditNoteActivity extends AppCompatActivity {
     public static final String EXTRA_TANGGAL =
             "com.example.holiday.EXTRA_TANGGAL";
     public static final String EXTRA_DESCRIPTION =
             "com.example.holiday.EXTRA_DESCRIPTION";
+    public static final String EXTRA_ID =
+            "com.example.holiday.EXTRA_ID";
 
     private EditText editTextTanggal;
     private EditText editTextDescription;
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_note);
 
         editTextTanggal = findViewById(R.id.et_tanggal);
         editTextDescription = findViewById(R.id.et_deskripsi);
 
-        getSupportActionBar().setHomeAsUpIndicator(R.drawable.close);
+        Intent intent = getIntent();
 
-        setTitle("Add Note");
+        if (intent.hasExtra(EXTRA_ID)) {
+            setTitle("Edit Note");
+            editTextTanggal.setText(intent.getStringExtra(EXTRA_TANGGAL));
+            editTextDescription.setText(intent.getStringExtra(EXTRA_DESCRIPTION));
+        } else {
+            setTitle("Add Notes");
+        }
     }
 
-    private void saveNote(){
+    private void saveNote() {
         String tanggal = editTextTanggal.getText().toString();
         String description = editTextDescription.getText().toString();
 
@@ -45,12 +53,17 @@ public class AddNoteActivity extends AppCompatActivity {
             Toast.makeText(this, "Tidak boleh kosong", Toast.LENGTH_SHORT).show();
             return;
         }
-           Intent data = new Intent();
-           data.putExtra(EXTRA_TANGGAL, tanggal);
-           data.putExtra(EXTRA_DESCRIPTION, description);
+        Intent data = new Intent();
+        data.putExtra(EXTRA_TANGGAL, tanggal);
+        data.putExtra(EXTRA_DESCRIPTION, description);
 
-           setResult(RESULT_OK, data);
-           finish();
+        int id = getIntent().getIntExtra(EXTRA_ID, -1);
+        if(id != -1) {
+            data.putExtra(EXTRA_ID, id);
+        }
+
+        setResult(RESULT_OK, data);
+        finish();
 
     }
 

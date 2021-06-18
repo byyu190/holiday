@@ -5,11 +5,10 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,7 +20,7 @@ import android.widget.Toast;
 import com.example.holiday.R;
 import com.example.holiday.adapter.NoteAdapter;
 import com.example.holiday.model.note.Note;
-import com.example.holiday.view.activity.AddNoteActivity;
+import com.example.holiday.view.activity.AddEditNoteActivity;
 import com.example.holiday.view.viewmodel.NoteViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -33,6 +32,8 @@ import static android.app.Activity.RESULT_OK;
 public class NoteFragment extends Fragment {
     private NoteViewModel noteViewModel;
     public static final int ADD_NOTE_REQUEST = 1;
+    public static final int EDIT_NOTE_REQUEST = 2;
+
     public NoteFragment() {
         // Required empty public constructor
     }
@@ -53,8 +54,9 @@ public class NoteFragment extends Fragment {
         buttonAddNote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AddNoteActivity.class);
-                getActivity().startActivity(intent);
+                Intent intent = new Intent(getActivity(), AddEditNoteActivity.class);
+                startActivityForResult(intent, ADD_NOTE_REQUEST );
+
             }
         });
 
@@ -72,6 +74,31 @@ public class NoteFragment extends Fragment {
                 adapter.setNotes(notes);
             }
         });
+
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT| ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                noteViewModel.delete(adapter.getNoteAt(viewHolder.getAdapterPosition()));
+                Toast.makeText(getActivity(),"Berhasil Dihapus",Toast.LENGTH_SHORT).show();
+            }
+        }).attachToRecyclerView(recyclerView);
+
+        adapter.setOnItemClickListener(new NoteAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Note note) {
+                Intent intent = new Intent(getActivity(), AddEditNoteActivity.class);
+                intent.putExtra(AddEditNoteActivity.EXTRA_TANGGAL, note.getTanggal());
+                intent.putExtra(AddEditNoteActivity.EXTRA_DESCRIPTION, note.getDescription());
+                intent.putExtra(AddEditNoteActivity.EXTRA_ID, note.getId());
+                startActivityForResult(intent, EDIT_NOTE_REQUEST);
+            }
+        });
     }
 
     @Override
@@ -79,15 +106,34 @@ public class NoteFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == ADD_NOTE_REQUEST && resultCode == RESULT_OK) {
-            String tanggal = data.getStringExtra(AddNoteActivity.EXTRA_TANGGAL);
-            String description = data.getStringExtra(AddNoteActivity.EXTRA_DESCRIPTION);
+            String tanggal = data.getStringExtra(AddEditNoteActivity.EXTRA_TANGGAL);
+            String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
 
             Note note = new Note(tanggal,description);
             noteViewModel.insert(note);
 
-            Toast.makeText(getContext(), "Note Saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Note Saved", Toast.LENGTH_SHORT).show();
+        } else if (requestCode == EDIT_NOTE_REQUEST && resultCode == RESULT_OK) {
+            int id = data.getIntExtra(AddEditNoteActivity.EXTRA_ID, -1);
+
+            if(id == -1){
+                //error
+                Toast.makeText(getActivity(), "Note can't be Saved", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            String tanggal = data.getStringExtra(AddEditNoteActivity.EXTRA_TANGGAL);
+            String description = data.getStringExtra(AddEditNoteActivity.EXTRA_DESCRIPTION);
+
+            Note note = new Note(tanggal,description);
+            note.setId(id);
+            noteViewModel.update(note);
+
+            Toast.makeText(getActivity(), "Note Updated", Toast.LENGTH_SHORT).show();
         } else {
-            Toast.makeText(getContext(), "Note not Saved", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), "Note not Saved", Toast.LENGTH_SHORT).show();
         }
     }
+
+
 }
